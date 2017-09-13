@@ -66,11 +66,15 @@ class Article_categoryController extends \yii\web\Controller
 
         return $this->render('add', ['model' => $model]);
     }
-    public function actionDelete($id){
-        $Article=Article_category::findOne(['id'=>$id]);
-        $Article->status=-1;
-        $Article->save(false);
-        \Yii::$app->session->setFlash('success','删除成功');
-        return $this->redirect(['article_category/index']);
+    public function actionDel(){
+        $id=\Yii::$app->request->post('id');
+
+        $article_category=Article_category::findOne(['id'=>$id]);
+        if ($article_category){
+            $article_category->status=-1;
+            $article_category->save(false);
+            \Yii::$app->session->setFlash('success','删除成功');
+        }
+        $this->redirect(['article_category/index']);
     }
 }

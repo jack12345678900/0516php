@@ -3,9 +3,11 @@
 namespace backend\controllers;
 
 use backend\models\Brand;
+use Codeception\Module\Yii1;
 use yii\data\Pagination;
 use yii\web\UploadedFile;
 use flyok666\uploadifive\UploadAction;
+use flyok666\qiniu\Qiniu;
 
 class BrandController extends \yii\web\Controller{
 
@@ -41,7 +43,7 @@ class BrandController extends \yii\web\Controller{
                 //移动文件
 
                 $model->save();
-                \Yii::$app->session->setFlash('success', ';添加成功');
+                \Yii::$app->session->setFlash('success', '添加成功');
                 return $this->redirect(['brand/index']);
             } else {
                 var_dump($model->getErrors());
@@ -73,7 +75,7 @@ class BrandController extends \yii\web\Controller{
                 //移动文件
 
                 $model->save();
-                \Yii::$app->session->setFlash('success', ';修改成功');
+                \Yii::$app->session->setFlash('success', '修改成功');
                 return $this->redirect(['brand/index']);
             } else {
                 var_dump($model->getErrors());
@@ -83,19 +85,28 @@ class BrandController extends \yii\web\Controller{
 
         return $this->render('add', ['model' => $model]);
     }
-   public function actionDelete($id){
-        $brand=Brand::findOne(['id'=>$id]);
-        $brand->status=-1;
+   public function actionDel(){
+        $id=\Yii::$app->request->post('id');
 
-        $brand->save(false);
-        \Yii::$app->session->setFlash('success','删除成功');
-        return $this->redirect(['brand/index']);
+        $brand=Brand::findOne(['id'=>$id]);
+        if ($brand){
+            $brand->status=-1;
+            $brand->save(false);
+           \Yii::$app->session->setFlash('success','删除成功');
+        }
+       $this->redirect(['brand/index']);
    }
 
 
 
     public function actions() {
         return [
+
+                 'upload' => [
+                     'class' => 'kucha\ueditor\UEditorAction',
+    ],
+
+
             's-upload' => [
                 'class' => UploadAction::className(),
                 'basePath' => '@webroot/upload',
@@ -132,12 +143,42 @@ class BrandController extends \yii\web\Controller{
                 'afterValidate' => function (UploadAction $action) {},
                 'beforeSave' => function (UploadAction $action) {},
                 'afterSave' => function (UploadAction $action) {
-                    $action->output['fileUrl'] = $action->getWebUrl();
+                   // $action->output['fileUrl'] = $action->getWebUrl();
 //                    $action->getFilename(); // "image/yyyymmddtimerand.jpg"
 //                    $action->getWebUrl(); //  "baseUrl + filename, /upload/image/yyyymmddtimerand.jpg"
 //                    $action->getSavePath(); // "/var/www/htdocs/upload/image/yyyymmddtimerand.jpg"
+                    //将图片上传到七牛云,并且返回七牛云的图片地址
+
+
+                    $qiniu = new Qiniu(\Yii::$app->params['qiniuyun']);
+                    $key = $action->getWebUrl();
+                    $file=$action->getSavePath();
+                    $qiniu->uploadFile($file,$key);
+                    $url = $qiniu->getLink($key);
+                    $action->output['fileUrl'] = $url;
                 },
             ],
         ];
     }
+
+    //测试七牛云
+//
+//    public function actionQiu(){
+//
+//
+//        $config = [
+//            'accessKey'=>'3IvRW-xuFs0vyyr8j-JtYdsSRsdQRgU484voZypH',
+//            'secretKey'=>'NY4fIhRrVvd9BHnCIXIbHLFWSvtbGpGbN8YVmGhN',
+//            'domain'=>'http://ow0l0w3r4.bkt.clouddn.com/',
+//            'bucket'=>'0516php',
+//            'area'=>Qiniu::AREA_HUABEI
+//        ];
+//
+//        $qiniu = new Qiniu($config);
+//        $key = '1.jpg';
+//        $file=\Yii::getAlias('@webroot/upload/1.jpg');
+//        $qiniu->uploadFile($file,$key);
+//        $url = $qiniu->getLink($key);
+//        var_dump($url);
+//    }
 }

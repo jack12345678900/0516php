@@ -3,7 +3,7 @@ use yii\web\JsExpression;
 
 $form=\yii\bootstrap\ActiveForm::begin();
 echo $form->field($model,'name')->textInput();
-echo $form->field($model,'intro')->textarea();
+echo $form->field($model,'intro')->widget('kucha\ueditor\UEditor',[]);
 echo $form->field($model,'sort')->input('number');
 echo $form->field($model, 'status',['inline'=>true])->radioList(['1'=>'正常','0'=>'隐藏']);
 //上传文件框
