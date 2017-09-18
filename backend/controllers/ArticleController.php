@@ -11,6 +11,9 @@ class ArticleController extends \yii\web\Controller
 {
     public function actionIndex()
     {
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['admin/login']);
+        }
         $query=Article::find();
 
         $pager = new Pagination([
@@ -21,6 +24,10 @@ class ArticleController extends \yii\web\Controller
         return $this->render('index',['Article'=>$Article,'pager'=>$pager]);
     }
   public function actionAdd(){
+
+      if(\Yii::$app->user->isGuest){
+          return $this->redirect(['admin/login']);
+      }
         $model=new Article();
       $models=new Article_Detail();
         $request=\Yii::$app->request;
@@ -32,21 +39,26 @@ class ArticleController extends \yii\web\Controller
                 //验证
                 $model->create_time = time();
                 $model->save();
-                $models->article_id=$model->id;
+                $models->article_id = $model->id;
                 $models->save();
                 \Yii::$app->session->setFlash('success', ';添加成功');
-                return $this->redirect(['article/index']);
-           } else {
-                var_dump($model->getErrors());
-                exit;
+                    return $this->redirect(['article/index']);
+                } else {
+                    var_dump($model->getErrors());
+                    exit;
+                }
             }
-        }
+
 
         $gory=Article_category::find()->all();
        return $this->render('add',['model'=>$model,'gory'=>$gory,'models'=>$models]);
   }
 
     public function actionEdit($id){
+
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['admin/login']);
+        }
         $model=Article::findOne(['id'=>$id]);
         $models=Article_Detail::findOne(['article_id'=>$id]);
         $request=\Yii::$app->request;
@@ -73,6 +85,10 @@ class ArticleController extends \yii\web\Controller
         return $this->render('add',['model'=>$model,'gory'=>$gory,'models'=>$models]);
     }
     public function actionDel(){
+
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['admin/login']);
+        }
         $id=\Yii::$app->request->post('id');
         //$article_id=\Yii::$app->request->post('article_id');
       //  $article_detail=Article_Detail::findOne(['article_id'=>$article_id]);
@@ -88,6 +104,10 @@ class ArticleController extends \yii\web\Controller
     }
 
     public function actionShow($article_id){
+
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['admin/login']);
+        }
         $model=Article_Detail::findOne(['article_id'=>$article_id]);
         //var_dump($model);exit;
         return $this->render('show',['model'=>$model]);

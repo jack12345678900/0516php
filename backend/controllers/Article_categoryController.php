@@ -10,6 +10,10 @@ class Article_categoryController extends \yii\web\Controller
 {
     public function actionIndex()
     {
+
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['admin/login']);
+        }
          $query=Article_category::find();
         $pager = new Pagination([
             'totalCount' => $query->where(['>','status','-1'])
@@ -24,6 +28,10 @@ class Article_categoryController extends \yii\web\Controller
     }
 
     public function actionAdd(){
+
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['admin/login']);
+        }
         $model=new Article_category();
         $request=\Yii::$app->request;
         if ($request->isPost) {
@@ -48,6 +56,10 @@ class Article_categoryController extends \yii\web\Controller
     }
 
     public function actionEdit($id){
+
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['admin/login']);
+        }
         $model=Article_category::findOne(['id'=>$id]);
         $request=\Yii::$app->request;
         if ($request->isPost) {
@@ -67,6 +79,10 @@ class Article_categoryController extends \yii\web\Controller
         return $this->render('add', ['model' => $model]);
     }
     public function actionDel(){
+
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['admin/login']);
+        }
         $id=\Yii::$app->request->post('id');
 
         $article_category=Article_category::findOne(['id'=>$id]);

@@ -9,7 +9,7 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use common\widgets\Alert;
-
+use backend\models\Menu;
 AppAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
@@ -28,22 +28,30 @@ AppAsset::register($this);
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => 'My Company',
+        'brandLabel' => '低调后台',
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
-    $menuItems = [
-        ['label' => 'Home', 'url' => ['/site/index']],
-    ];
     if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
+        $menuItems=[
+                ['label' => '登录', 'url' => ['/admin/login']],
+
+        ];
+
     } else {
+//        $menuItems = [
+//            ['label' => '管理员','items'=>[
+//                ['lable'=>'添加用户','url'=>['admin/add']],
+//                ['lable'=>'用户列表','url'=>['admin/index']],
+//            ]],
+//        ];
+        $menuItems=Menu::getMenus();
         $menuItems[] = '<li>'
-            . Html::beginForm(['/site/logout'], 'post')
+            . Html::beginForm(['/admin/logout'], 'post')
             . Html::submitButton(
-                'Logout (' . Yii::$app->user->identity->username . ')',
+                '注销 (' . Yii::$app->user->identity->username . ')',
                 ['class' => 'btn btn-link logout']
             )
             . Html::endForm()

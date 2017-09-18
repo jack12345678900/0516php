@@ -20,34 +20,59 @@ class GoodsController extends \yii\web\Controller
 {
     public function actionIndex()
     {
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['admin/login']);
+        }
 
 
-        $query=Goods::find();
+
         $search=new GoodsSearch();
+        $query=Goods::find();
         $search->search($query);
+        //$query=Goods::find();
+      //  $search=new GoodsSearch();
+
+
          //
         $pager = new Pagination([
-            'totalCount' => $query->where(['>','status','0'])->count(),
+            'totalCount' => $query->andWhere(['>','status','0'])->count(),
             'defaultPageSize' => 2
         ]);
 
         $good= $query->limit($pager->limit)->offset($pager->offset)->all();
 
 
+
         return $this->render('index',['good'=>$good,'pager'=>$pager,'search'=>$search]);
+        //var_dump($query);exit;
     }
+// public function actionSearch(){
+//
+//
+//     $search=new GoodsSearch();
+//     $query=Goods::find();
+//     $search->search($query);
+//
+//     return $this->render('index',['search'=>$search]);
+// }
+
+
 
     public function actionAdd(){
+
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['admin/login']);
+        }
         $goods=new Goods();
         $goods_count=new Goods_day_count();
         $goods_intro=new Goods_intro();
+        //$Goodscategory=new GoodsCategory();
         $request=\Yii::$app->request;
         if ($request->isPost){
             $goods->load($request->post());
             $goods_count->load($request->post());
             $goods_intro->load($request->post());
             if ($goods->validate() && $goods_intro->validate()){
-
                 $goods_intro->goods_id=$goods->id;
                 $goods_intro->save();
                 $goods->create_time=time();
@@ -85,12 +110,16 @@ class GoodsController extends \yii\web\Controller
 
         }
         $brand=Brand::find()->all();
-        $Goodscategory=GoodsCategory::find()->all();
-        return $this->render('add',['goods'=>$goods,'brand'=>$brand,'Goodscategory'=>$Goodscategory,'goods_intro'=>$goods_intro]);
+        //$Goodscategory=GoodsCategory::find()->all();
+        return $this->render('add',['goods'=>$goods,'brand'=>$brand,'goods_intro'=>$goods_intro]);
 
     }
 
     public function actionEdit($id){
+
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['admin/login']);
+        }
         $goods=Goods::findOne(['id'=>$id]);
         $goods_intro=Goods_intro::findOne(['goods_id'=>$id]);
         $request=\Yii::$app->request;
@@ -119,6 +148,10 @@ class GoodsController extends \yii\web\Controller
 
     }
     public function actionDel(){
+
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['admin/login']);
+        }
         $id=\Yii::$app->request->post('id');
         $goods=Goods::findOne(['id'=>$id]);
 
@@ -132,23 +165,32 @@ class GoodsController extends \yii\web\Controller
 
 
     public function actionShow($goods_id){
+
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['admin/login']);
+        }
         $goods_id=Goods_intro::findOne(['goods_id'=>$goods_id]);
         return $this->render('show',['goods_id'=>$goods_id]);
     }
 
     //商品相册
     public function actionGallery($id){
-        $goods=Goods::findOne(['id'=>$id]);
-        if($goods==null){
-            throw new NotFoundHttpException('该商品不存在');
+
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['admin/login']);
         }
-        //  $goods=GoodsGallery::findAll(['goods_id'=>$id]);
+        $goods=Goods::findOne(['id'=>$id]);
+
         $gallerys=GoodsGallery::find()->all();
         return $this->render('gallery',['goods'=>$goods,'gallerys'=>$gallerys]);
     }
 
     //删除相册
     public function actionDelGallery(){
+
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['admin/login']);
+        }
         $id=\Yii::$app->request->post('id');
         $model=GoodsGallery::findOne(['id'=>$id]);
         if($model&&$model->delete()){
@@ -157,50 +199,6 @@ class GoodsController extends \yii\web\Controller
             return 'fail';
         }
     }
-//    public function actionSearch(){
-//        //接搜索传过来的值
-//        $data=\Yii::$app->request->get();
-//        //实例化查询类
-//        $query=new \yii\db\Query();
-//        //查询表
-//        $query->from('goods');
-//        //判断班级名称的值是否存在，不存在则为空
-//        if(isset($data['name'])&&$data['name']!=''){
-//            $query->andWhere(['like','name',$data['name']]);   //是andWhere  不是addwhere  括号里是数组
-//        }else{
-//            $data['name']='';
-//        }
-//        //判断班级描述是否为空，否则的话就为空
-//        if(isset($data['name'])&&$data['sn']!=''){
-//            $query->andWhere(['like','sn',$data['sn']]);
-//        }else{
-//            $data['sn']='';
-//        }
-//        //判断添加的时间   (特殊情况，在此不在进行判断,直接赋值是空)
-//        $data['shop_price']='';
-//
-//        // $cla=new Classes();
-//        // $arr=$cla->find();
-//        $pages= new Pagination([
-//            'totalCount'=>$query->count(),
-//            'pageSize'  => 2   //每页显示条数
-//
-//        ]);
-//        $models = $query->offset($pages->offset)  //查询出来的每一页的
-//        ->limit($pages->limit)
-//            ->all();
-//        return $this->render('goods/index', [
-//            'models' => $models,
-//            'pages'  => $pages,
-//            'data'   =>$data,  //搜索的默认值
-//        ]);
-//
-//    }
-//
-
-
-
-
 
 
     public function actions() {
@@ -245,7 +243,7 @@ class GoodsController extends \yii\web\Controller
                     $model->goods_id=\Yii::$app->request->post('goods_id');
                     $model->path = $action->getWebUrl();
                     $model->save();
-                    //返回到页面的路劲
+
                     $action->output['fileUrl'] = $model->path;
 
                     $qiniu = new Qiniu(\Yii::$app->params['qiniuyun']);

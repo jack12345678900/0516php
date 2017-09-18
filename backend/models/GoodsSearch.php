@@ -30,21 +30,24 @@ class GoodsSearch extends Model
         ];
     }
 
-    public function search(ActiveQuery $query)
+    public function search(ActiveQuery $params)
     {
+
         //加载表单提交的数据
         $this->load(\Yii::$app->request->get());
         if($this->name){
-            $query->Where(['like','name',$this->name]);
+            $params->Where(['like','name',$this->name]);
         }
         if($this->sn){
-            $query->andWhere(['like','sn',$this->sn]);
+            $params->andWhere(['like','sn',$this->sn]);
         }
         if($this->maxPrice){
-            $query->andWhere(['<=','shop_price',$this->maxPrice]);
+            $params->andWhere(['<=','shop_price',$this->maxPrice]);
         }
         if($this->minPrice){
-            $query->andWhere(['>=','shop_price',$this->minPrice]);
+            $params->andWhere(['>=','shop_price',$this->minPrice]);
+//            var_dump($query);exit;
         }
+        //return $params;
     }
 }

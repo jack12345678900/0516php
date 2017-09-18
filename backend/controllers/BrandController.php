@@ -13,6 +13,10 @@ class BrandController extends \yii\web\Controller{
 
      public $enableCsrfValidation=false;
     public function actionIndex(){
+
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['admin/login']);
+        }
         $query=Brand::find();
         $pager = new Pagination([
             'totalCount' => $query->where(['>','status','-1'])->count(),
@@ -24,6 +28,10 @@ class BrandController extends \yii\web\Controller{
     }
 
     public function actionAdd(){
+
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['admin/login']);
+        }
         $model=new Brand();
         $request=\Yii::$app->request;
         if ($request->isPost) {
@@ -56,6 +64,10 @@ class BrandController extends \yii\web\Controller{
 
 
     public function actionEdit($id){
+
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['admin/login']);
+        }
         $model=Brand::findOne(['id'=>$id]);
         $request=\Yii::$app->request;
         if ($request->isPost) {
@@ -86,6 +98,10 @@ class BrandController extends \yii\web\Controller{
         return $this->render('add', ['model' => $model]);
     }
    public function actionDel(){
+
+       if(\Yii::$app->user->isGuest){
+           return $this->redirect(['admin/login']);
+       }
         $id=\Yii::$app->request->post('id');
 
         $brand=Brand::findOne(['id'=>$id]);

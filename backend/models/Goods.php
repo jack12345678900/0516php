@@ -4,7 +4,9 @@ namespace backend\models;
 
 use backend\models\Brand;
 use backend\models\GoodsCategory;
+use creocoder\nestedsets\NestedSetsBehavior;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "goods".
@@ -27,6 +29,7 @@ use Yii;
 class Goods extends \yii\db\ActiveRecord
 {
     public $file;
+
     /**
      * @inheritdoc
      */
@@ -71,10 +74,33 @@ class Goods extends \yii\db\ActiveRecord
         ];
     }
 
+    public static function getZNodes()
+    {
+        $top = ['id' => 0, 'name' => '顶级分类', 'parent_id' => 0];
+        $goods = GoodsCategory::find()->select(['id', 'parent_id', 'name'])->asArray()->all();
+        //  array_unshift($goodsCategories,$top);
+        //  var_dump($goodsCategories);exit();
+        return ArrayHelper::merge([$top], $goods);
+    }
+
+
+
+    public function transactions()
+    {
+        return [
+            self::SCENARIO_DEFAULT => self::OP_ALL,
+        ];
+    }
+
+    public static function find()
+    {
+        return new CategoryQuery(get_called_class());
+    }
+
     public function getBrand(){
         return $this->hasOne(Brand::className(),['id'=>'brand_id']);
     }
-    public function getGoods_category(){
-        return $this->hasOne(GoodsCategory::className(),['id'=>'goods_category_id']);
-    }
+//    public function getGoods_category(){
+//        return $this->hasOne(GoodsCategory::className(),['id'=>'goods_category_id']);
+//    }
 }

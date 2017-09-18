@@ -19,11 +19,12 @@ $form=yii\bootstrap\ActiveForm::begin([
     'action'=>yii\helpers\Url::to(['goods/index']),
     'options'=>['class'=>'form-inline']
 ]);
-echo $form->field($search,'name')->textInput(['placeholder'=>'商品名','name'=>'keyword'])->label(false);
+echo $form->field($search,'name')->textInput(['placeholder'=>'商品名'])->label(false);
 echo $form->field($search,'sn')->textInput(['placeholder'=>'货号'])->label(false);
-echo $form->field($search,'minPrice')->textInput(['placeholder'=>'$'])->label(false);
-echo $form->field($search,'maxPrice')->textInput(['placeholder'=>'$'])->label('--');
-echo yii\bootstrap\Html::submitButton('搜索');
+echo $form->field($search,'minPrice')->textInput(['placeholder'=>'最低$'])->label(false);
+echo $form->field($search,'maxPrice')->textInput(['placeholder'=>'最高$'])->label(false);
+
+echo yii\bootstrap\Html::submitButton('搜索',['class'=>'btn btn-info']);
 
 $form= yii\bootstrap\ActiveForm::end();
 ?>
@@ -61,7 +62,7 @@ $form= yii\bootstrap\ActiveForm::end();
 
 
             </td>
-            <td><?=$goods->goods_category->name?></td>
+            <td><?=$goods->goods_category_id?></td>
             <td><?=$goods->brand->name?></td>
 
             <td><?=$goods->shop_price?></td>

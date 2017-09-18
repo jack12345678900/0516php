@@ -10,6 +10,10 @@ class GoodsCategoryController extends \yii\web\Controller
 {
     public function actionIndex()
     {
+
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['admin/login']);
+        }
         //1获取所有的用户数据
         $request =GoodsCategory::find();
         //每页多少条,总条数
@@ -26,6 +30,10 @@ class GoodsCategoryController extends \yii\web\Controller
     }
     public function actionAdd()
     {
+
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['admin/login']);
+        }
         $model = new GoodsCategory();
         $requset = \Yii::$app->request;
         if ($requset->isPost) {
@@ -55,6 +63,10 @@ class GoodsCategoryController extends \yii\web\Controller
     //修改
     public function actionEdit($id)
     {
+
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['admin/login']);
+        }
         $model = GoodsCategory::findOne(['id'=>$id]);
         $requset = \Yii::$app->request;
         if ($requset->isPost) {
@@ -99,8 +111,10 @@ class GoodsCategoryController extends \yii\web\Controller
 
     //删除
     //bug 删除根节点报错
-    public function actionDelete()
+    public function actionDelete($id)
     {
+
+
         $model=GoodsCategory::findOne(['id'=>\Yii::$app->request->post('id')]);
 
         //判断是否有子节点
@@ -109,7 +123,7 @@ class GoodsCategoryController extends \yii\web\Controller
 
         }
 
-        $model = GoodsCategory::findOne(['id' => $id]);
+       $model = GoodsCategory::findOne(['id' => $id]);
         if ($model->parent_id) {
             $child = GoodsCategory::findOne(['parent_id' => $model->id]);
             // var_dump($child);exit;
