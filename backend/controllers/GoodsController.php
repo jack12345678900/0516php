@@ -53,7 +53,7 @@ class GoodsController extends \yii\web\Controller
 //     $query=Goods::find();
 //     $search->search($query);
 //
-//     return $this->render('index',['search'=>$search]);
+//     return $this->render('shop',['search'=>$search]);
 // }
 
 

@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="/style/footer.css" type="text/css">
 </head>
 <body>
+<style>
+    .error{color: red}
+</style>
 <!-- 顶部导航 start -->
 <div class="topnav">
     <div class="topnav_bd w990 bc">
@@ -18,7 +21,17 @@
         </div>
         <div class="topnav_right fr">
             <ul>
-                <li>您好，欢迎来到南美蝶商城！[<a href="login.html">登录</a>] [<a href="register.html">免费注册</a>] </li>
+                <?php  if(Yii::$app->user->isGuest): ?>
+                    <li>
+                        欢迎来到南美蝶独家商城！[<a href="<?=\yii\helpers\Url::to(['member/login'])?>">登录</a>]
+                        [<a href="<?=\yii\helpers\Url::to(['member/register'])?>">免费注册</a>]
+                    </li>
+                <?php else: ?>
+                    <li>
+                        欢迎来到南美蝶独家商城！当前用户:    <?=Yii::$app->user->identity->username?>
+                        [<a href="<?=\yii\helpers\Url::to(['member/logout'])?>">注销</a>]
+                    </li>
+                <?php endif;?>
                 <li class="line">|</li>
                 <li>我的订单</li>
                 <li class="line">|</li>
@@ -48,26 +61,26 @@
     </div>
     <div class="login_bd">
         <div class="login_form fl">
-            <form action="" method="post" id="signupForm">
+            <form  method="post" id="signupForm">
                 <ul>
                     <li>
                         <label for="">用户名：</label>
-                        <input type="text" class="txt" name="username" />
+                        <input type="text" class="txt"  name="username"/>
                         <p>3-20位字符，可由中文、字母、数字和下划线组成</p>
                     </li>
                     <li>
                         <label for="">密码：</label>
-                        <input type="password" class="txt" name="password" />
+                        <input type="password" class="txt" name="password" id="password"/>
                         <p>6-20位字符，可使用字母、数字和符号的组合，不建议使用纯数字、纯字母、纯符号</p>
                     </li>
                     <li>
                         <label for="">确认密码：</label>
-                        <input type="password" class="txt" name="password" />
+                        <input type="password" class="txt" name="password1" />
                         <p> <span>请再次输入密码</p>
                     </li>
                     <li>
                         <label for="">邮箱：</label>
-                        <input type="text" class="txt" name="email" />
+                        <input type="email" class="txt" name="email" />
                         <p>邮箱必须合法</p>
                     </li>
                     <li>
@@ -76,13 +89,13 @@
                     </li>
                     <li>
                         <label for="">验证码：</label>
-                        <input type="text" class="txt" value="" placeholder="请输入短信验证码" name="captcha" disabled="disabled" id="captcha"/> <input type="button" onclick="bindPhoneNum(this)" id="get_captcha" value="获取验证码" style="height: 25px;padding:3px 8px"/>
+                        <input type="text" class="txt" value="" placeholder="请输入短信验证码" name="sms" disabled="disabled" id="captcha"/> <input type="button" onclick="bindPhoneNum(this)" id="get_captcha" value="获取验证码" style="height: 32px;padding:1px 8px"/>
 
                     </li>
                     <li class="checkcode">
                         <label for="">验证码：</label>
                         <input type="text"  name="checkcode" />
-                        <img src="captcha_img" alt="" />
+                        <img id="captcha_img" alt="" />
                         <span>看不清？<a href="javascript:;" id="change_captcha">换一张</a></span>
                     </li>
 
@@ -92,6 +105,7 @@
                     </li>
                     <li>
                         <label for="">&nbsp;</label>
+                        <input type="hidden" name="_csrf-frontend" value="<?=\Yii::$app->request->csrfToken?>">
                         <input type="submit" value="" class="login_btn" />
                     </li>
                 </ul>
@@ -102,7 +116,7 @@
 
         <div class="mobile fl">
             <h3>手机快速注册</h3>
-            <p>中国大陆手机用户，编辑短信 “<strong>XX</strong>”发送到：</p>
+            <p>中国大陆手机用户，编辑短信 “<strong>zj</strong>”发送到：</p>
             <p><strong>1069099988</strong></p>
         </div>
 
@@ -127,7 +141,7 @@
         <a href="">京西论坛</a>
     </p>
     <p class="copyright">
-        © 2005-2013 南美蝶网上商城 版权所有，并保留所有权利。  ICP备案证书号:京ICP证070359号
+        © 2005-2013 京东网上商城 版权所有，并保留所有权利。  ICP备案证书号:京ICP证070359号
     </p>
     <p class="auth">
         <a href=""><img src="/images/xin.png" alt="" /></a>
@@ -138,6 +152,8 @@
 </div>
 <!-- 底部版权 end -->
 <script type="text/javascript" src="/js/jquery-1.8.3.min.js"></script>
+<script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
+<script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/localization/messages_zh.js"></script>
 <script type="text/javascript">
     function bindPhoneNum(){
         //启用输入框
@@ -157,46 +173,99 @@
 
             $('#get_captcha').val(html);
         },1000);
+        //发送短信
+        $.post("<?=yii\helpers\Url::to(['sms'])?>",{phone:$("#tel").val(),'_csrf-frontend':'<?=Yii::$app->request->csrfToken?>'},function (data) {
+            console.log(data);
+        })
     }
-
-    $().ready(function () {
-        //在键盘按下并释放及提交后验证提交表单
+    $().ready(function() {
+// 在键盘按下并释放及提交后验证提交表单
         $("#signupForm").validate({
-            rules:{
-                username:{
-                    required:true,//用户名必填
-                    minlength:3,
-                    maxlength:10,
-                    remote:"<?=yii\helpers\Url::to(['member/validate-user'])?>"//验证用户名的唯一性
+        rules: {
+            username: {
+                required: true,//用户名 必填
+                minlength: 3,
+                maxlength: 20,
+                remote: "<?=\yii\helpers\Url::to(['member/validate-user'])?>"//验证用户名唯一
 
-                },
-                checkcode:"validateCaptcha"//使用自定义验证码
             },
-            messages:{
-                username:{
-                    required:"请输入用户名",
-                    minlength:"用户名必须有3个字符组成",
-                    maxlength:"用户名不能超过10个字符组成",
-                    remote:"用户名已经存在"
-                },
+            password: {
+                required: true,//密码 必填
+                minlength: 6,
+                maxlength: 20
+
             },
-            errorElement:'span'//错误信息标签
+            password1: {
+                required: true,//密码必填
+                minlength: 6,
+                maxlength: 20,
+                equalTo: "#password"
+            },
 
-        });
+            tel:{
+                required: true,//电话 必填
+                maxlength:11,
+                minlength:11
 
+            },
+            email: {
+                required: true,//邮箱 必填
+                minlength: 6
+            },
+            sms:{
+                required:true,
+                remote:{
+                    url:"<?=\yii\helpers\Url::to(['member/validate-sms'])?>",
+                    type:"get",
+                    // dataType:"json",
+                    data:{
+                        phone:function(){
+                            return $("#tel").val();
+                        }
+                    }
+                }
+            },
+            checkcode: "validateCaptcha"//使用自定义验证规则验证验证码
+
+
+
+        },
+        messages: {
+            sms:{
+                remote:"验证码错误"
+            },
+            username: {
+                required: "请输入用户名",
+                minlength: "用户名必需由3个字符组成",
+                maxlength: "用户名不能超过20字符组成",
+                remote:"用户名已存在"
+            },
+            password: {
+                required: "请输入密码",
+                minlength: "密码必需由6个字符组成",
+                maxlength: "密码不能超过20字符组成",
+                equalTo: "两次密码不一致"
+
+            },
+            email: {
+                remote: "请输入邮箱"
+            }
+        },
+        errorElement:'span'//错误信息的标签
     });
-     var hash;
-     //获取验证码
-    var captcha_url='<?=yii\helpers\Url::to(['site/captcha'])?>';
-    //获取新验证码url
-    var change_captcha=function () {
-        $.getJSON(captcha_url,{refresh:1},function (json) {
+    });
+    var hash;
+    //获取验证码
+    var captcha_url = '<?=\yii\helpers\Url::to(['site/captcha'])?>';
+    //获取新验证码的url
+    var change_captcha = function(){
+        $.getJSON(captcha_url,{refresh:1},function(json){
             $("#captcha_img").attr('src',json.url);
             //获取hash
-            hash=json.hash1;
+            hash = json.hash1;
             console.log(hash);
-        })
-    };
+        });
+    }
     change_captcha();
     //切换验证码
     $("#change_captcha").click(function(){

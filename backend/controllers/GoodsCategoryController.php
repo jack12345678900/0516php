@@ -118,10 +118,10 @@ class GoodsCategoryController extends \yii\web\Controller
         $model=GoodsCategory::findOne(['id'=>\Yii::$app->request->post('id')]);
 
         //判断是否有子节点
-        if ($model->isLeaf()){
-            //是否是叶子子节点(是否有子节点)
-
-        }
+//        if ($model->isLeaf()){
+//            //是否是叶子子节点(是否有子节点)
+//
+//        }
 
        $model = GoodsCategory::findOne(['id' => $id]);
         if ($model->parent_id) {

@@ -4,7 +4,19 @@
 @时间：2013年11月14日
 */
 $(function(){
-	//收货人修改
+
+    $('.freight').click(
+        function () {
+
+            var money=$(this).attr('data-id');
+            var total=$('.money').attr('data-id');
+            $('.gross').text('￥'+money)
+            $('.money').text('￥'+(parseInt(money)+parseInt(total))+'元');
+        }
+    )
+
+
+    //收货人修改
 	$("#address_modify").click(function(){
 		$(this).hide();
 		$(".address_info").hide();

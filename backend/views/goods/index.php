@@ -16,7 +16,7 @@ status	int(2)	状态(-1删除 0隐藏 1正常)
 $form=yii\bootstrap\ActiveForm::begin([
         'method'=>'get',
     //get方式提交,需要显示指定action
-    'action'=>yii\helpers\Url::to(['goods/index']),
+    'action'=>yii\helpers\Url::to(['goods/shop']),
     'options'=>['class'=>'form-inline']
 ]);
 echo $form->field($search,'name')->textInput(['placeholder'=>'商品名'])->label(false);

@@ -216,13 +216,13 @@ class AdminController extends \yii\web\Controller
 
     public function actionDelete($id){
 
-        if(\Yii::$app->user->isGuest){
-            return $this->redirect(['admin/login']);
-        }
-        Admin::deleteAll(['id'=>$id]);
-        \Yii::$app->session->setFlash('success', '删除成功');
-        return $this->redirect(['admin/index']);
+    if(\Yii::$app->user->isGuest){
+        return $this->redirect(['admin/login']);
     }
+    Admin::deleteAll(['id'=>$id]);
+    \Yii::$app->session->setFlash('success', '删除成功');
+    return $this->redirect(['admin/index']);
+}
     //注销
     public function actionLogout(){
         \Yii::$app->user->logout();

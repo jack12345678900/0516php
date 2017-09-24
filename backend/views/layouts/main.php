@@ -44,7 +44,7 @@ AppAsset::register($this);
 //        $menuItems = [
 //            ['label' => '管理员','items'=>[
 //                ['lable'=>'添加用户','url'=>['admin/add']],
-//                ['lable'=>'用户列表','url'=>['admin/index']],
+//                ['lable'=>'用户列表','url'=>['admin/shop']],
 //            ]],
 //        ];
         $menuItems=Menu::getMenus();
